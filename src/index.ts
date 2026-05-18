@@ -13,6 +13,18 @@
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response("Hello World!");
+		const html = `
+			<!DOCTYPE html>
+			<html>
+				<head><title>Worker Page</title></head>
+				<body>
+					<h1>Cloudflare Worker Says Hi</h1>
+					<p>I hope you have a wonderful life</p>
+				</body>
+			</html>`;
+
+		return new Response(html, {
+			headers: { 'content-type': 'text/html' },
+		});
 	},
 } satisfies ExportedHandler<Env>;
