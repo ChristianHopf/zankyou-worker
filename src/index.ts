@@ -28,6 +28,23 @@ export default {
 
 		// Clone and modify response
 		response = new Response(response.body, response);
+
+		// Basic HTMLRewriter
+		if (response.headers.get('content-type')?.includes('text/html')) {
+			const rewriter = new HTMLRewriter().onDocument({
+				end(end) {
+					end.append(
+						`
+						<script>
+							console.log('HTMLRewriter says hello');
+						</script>`,
+						{ html: true }
+					);
+				},
+			});
+
+			response = rewriter.transform(response);
+		}
 		response.headers.set('X-Transformed', 'Hello');
 
 		return response;
