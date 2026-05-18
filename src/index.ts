@@ -13,7 +13,7 @@
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		const zankyouOriginUrl = 'https://zankyou-worker.vercel.app/';
+		const zankyouOriginUrl = 'https://zankyou-worker.vercel.app';
 
 		// Reconstruct url with given path and search properties
 		// ex: request URL is https://myworker.com/anime/23283/reviews?page=1
@@ -22,26 +22,14 @@ export default {
 		const url = new URL(request.url);
 		const targetUrl = zankyouOriginUrl + url.pathname + url.search;
 
-		const response = await fetch(targetUrl, {
-			method: request.method,
-			headers: request.headers,
-			body: request.body,
-		});
+		console.log(`Proxying ${url.pathname}${url.search} to ${targetUrl}`);
+
+		let response = await fetch(targetUrl, request);
+
+		// Clone and modify response
+		response = new Response(response.body, response);
+		response.headers.set('X-Transformed', 'Hello');
 
 		return response;
-
-		// const html = `
-		// 	<!DOCTYPE html>
-		// 	<html>
-		// 		<head><title>Worker Page</title></head>
-		// 		<body>
-		// 			<h1>Cloudflare Worker Says Hi</h1>
-		// 			<p>I hope you have a wonderful life</p>
-		// 		</body>
-		// 	</html>`;
-
-		// return new Response(html, {
-		// 	headers: { 'content-type': 'text/html' },
-		// });
 	},
 } satisfies ExportedHandler<Env>;
